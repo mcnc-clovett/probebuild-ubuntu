@@ -5,7 +5,7 @@ sudo cp ./ZscalerRootCertificate-2048-SHA256.crt /usr/local/share/ca-certificate
 sudo update-ca-certificates
 
 # Set the Laptop Lid Switch handle to ignore so that the probe stays awake
-sed -i 's/#HandleLidSwitch=suspend/HandleLidSwitch=ignore/' /etc/systemd/logind.conf
+sudo sed -i 's/#HandleLidSwitch=suspend/HandleLidSwitch=ignore/' /etc/systemd/logind.conf
 
 # Install docker using official install script
 curl -fsSL https://get.docker.com/ | sh
@@ -18,6 +18,7 @@ sudo docker run -d -p 8000:8000 -p 9000:9000 --name=portainer --restart=always \
 	-v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer
 
 # Allow access to probe tools through the local firewall
+sudo sed -i 's/IPV6=yes/IPV6=no/' /etc/default/ufw
 sudo ufw allow ssh
 sudo ufw allow http
 sudo ufw allow https
@@ -38,6 +39,8 @@ sudo systemctl enable iperf3
 
 # Create homepage for web-based tools
 sudo cp ./index.html /var/www/html/
+
+echo "You now need to logout and log back in. Then run 'docker-compose up -d' from this directory."
 
 # Download and start docker containers
 #docker-compose up -d
