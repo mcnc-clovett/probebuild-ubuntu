@@ -12,7 +12,7 @@ curl -fsSL https://get.docker.com/ | sh
 sudo usermod -aG docker `whoami`
 
 # Install other supporting applications
-yum install -y tcpdump wireshark iperf iperf3 httpd docker-compose mosh
+yum install -y tcpdump tshark iperf iperf3 apache2 docker-compose mosh
 sudo docker volume create portainer_data
 sudo docker run -d -p 8000:8000 -p 9000:9000 --name=portainer --restart=always \
 	-v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer
@@ -25,7 +25,7 @@ sudo ufw allow 3000/tcp
 sudo ufw allow 3001/tcp
 sudo ufw allow 5001
 sudo ufw allow 5201
-sudo ufw allow enable
+sudo ufw enable
 
 # Add iperf service files and enable/start all services
 sudo useradd iperf -s /sbin/nologin
