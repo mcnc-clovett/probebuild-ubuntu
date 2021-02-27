@@ -1,0 +1,86 @@
+version: '2'
+services:
+  cacti:
+    image: "mcncclovett/cacti"
+    container_name: cacti
+    restart: unless-stopped
+    stop_grace_period: 20s
+    ports:
+      - "8080:80"
+      - "443:443"
+    environment:
+      - DB_NAME=cacti_master
+      - DB_USER=cactiuser
+      - DB_PASS=cactipassword
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_ROOT_PASS=rootpassword
+      - INITIALIZE_DB=1
+      - TZ=America/New_York
+    volumes:
+      - /docker/cacti/data:/cacti
+      - /docker/cacti/spine:/spine
+      - /docker/cacti/backups:/backups
+    links:
+      - db
+  db:
+    image: "mariadb:10.3"
+    container_name: cacti_db
+    domainname: example.com
+    hostname: db
+    restart: unless-stopped
+    stop_grace_period: 20s
+    ports:
+      - "3306:3306"
+    command:
+      - mysqld
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --max_connections=200
+      - --max_heap_table_size=128M
+      - --max_allowed_packet=32M
+      - --tmp_table_size=128M
+      - --join_buffer_size=128M
+      - --innodb_buffer_pool_size=1G
+      - --innodb_doublewrite=ON
+      - --innodb_flush_log_at_timeout=3
+      - --innodb_read_io_threads=32
+      - --innodb_write_io_threads=16
+      - --innodb_buffer_pool_instances=9
+      - --innodb_file_format=Barracuda
+      - --innodb_large_prefix=1
+      - --innodb_io_capacity=5000
+      - --innodb_io_capacity_max=10000
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpassword
+      - TZ=America/New_York
+    volumes:
+      - /docker/mysql:/var/lib/mysql
+  smokeping:
+    image: "linuxserver/smokeping"
+    container_name: smokeping
+    restart: unless-stopped
+    ports:
+      - "8081:80"
+    environment:
+      - TZ=America/New_York
+    volumes:
+      - /docker/smokeping/data:/data
+      - /docker/smokeping/config:/config
+  redis:
+    image: redis:alpine
+    container_name: redis
+    restart: unless-stopped
+    network_mode: host
+  ntopng:
+    image: mcncclovett/ntopng
+    container_name: ntopng
+    restart: unless-stopped
+    network_mode: host
+    command: bash -c "ntopng --http-port=3000 --https-port=3001 --local-networks 10.0.0.0/8 --redis localhost"
+    volumes:
+      - /docker/ntopng/config:/etc/ntopng
+    depends_on:
+      - redis
+volumes:
+  cacti-tmp:

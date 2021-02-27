@@ -1,0 +1,13 @@
+[Unit]
+Description=iperf Service
+After=network.target
+
+[Service]
+Type=simple
+User=iperf
+ExecStart=/usr/bin/iperf -s
+Restart=on-abort
+
+
+[Install]
+WantedBy=multi-user.target
