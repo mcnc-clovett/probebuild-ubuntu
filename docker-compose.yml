@@ -1,7 +1,7 @@
 version: '2'
 services:
   cacti:
-    image: "mcncclovett/cacti"
+    image: "smcline06/cacti"
     container_name: cacti
     restart: unless-stopped
     stop_grace_period: 20s
