@@ -1,8 +1,10 @@
 #!/bin/bash
 
+usage() { echo "Usage: $0 [-g] [-d] -f <devicefile.csv>" 1>&2; exit 1; }
+
 while getopts ":dgf:" opt; do
   cd /cacti
-  case $opt in
+  case ${opt} in
     f)
       DEVLIST="$OPTARG"
       ;;
@@ -19,10 +21,20 @@ while getopts ":dgf:" opt; do
   esac
 done
 
+cd /cacti
+
+if [ -z $DEVLIST ]; then
+  usage
+fi
+
+if [ -z $DEVICES ] && [ -z $GRAPHS ]; then
+  usage
+fi
+
 if [[ $DEVICES = true ]]; then
   while IFS="," read devname ipaddr comstring; do
-    php cli/add_device.php --description=$devname --ip=$ipaddr --community=$comstring --template=2 --version=2 --site=0;
-  done < /cacti/$DEVLIST
+    php cli/add_device.php --description=$devname --ip=$ipaddr --community=$comstring --template=2 --version=2 --site=0 --avail=ping --ping_method=icmp;
+  done < <(tail -n +2 /cacti/$DEVLIST)
 fi
 
 if [[ $GRAPHS = true ]]; then
