@@ -38,7 +38,7 @@ if [[ $DEVICES = true ]]; then
 fi
 
 if [[ $GRAPHS = true ]]; then
-  for i in $(php cli/add_graphs.php --list-hosts | awk '$3 ~ /8/ { print $1 }'); do
-    php cli/add_graphs.php --host-id="$i" --graph-type=ds --graph-template-id=44 --snmp-query-id=4 --snmp-query-type-id=21 --snmp-field=ifOperStatus --snmp-value=Up;
+  for i in $(php cli/add_graphs.php --list-hosts | awk '$3 ~ /2/ { print $1 }'); do
+    php cli/add_graphs.php --host-id="$i" --graph-type=ds --graph-template-id=42 --snmp-query-id=4 --snmp-query-type-id=21 --snmp-field=ifOperStatus --snmp-value=Up;
   done
 fi
